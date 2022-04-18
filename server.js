@@ -10,9 +10,9 @@ const cors = require("cors");
 const connectDB = require("./config/db");
 
 // Routes
-const coworking = require("./routes/co-working");
+//const coworking = require("./routes/co-working");
 const auth = require("./routes/auth");
-const reservations = require("./routes/reservation");
+const reservations = require("./routes/reservations");
 
 // Load env vars
 dotenv.config({ path: "./config/config.env" });
@@ -50,9 +50,9 @@ app.use(hpp());
 //Enable CORS
 app.use(cors());
 
-app.use("/coworking", coworking);
-app.use("/auth", auth);
-app.use("/reservation", reservations);
+//app.use("/api/v1/coworking", coworking);
+app.use("/api/v1/auth", auth);
+app.use("/api/v1/reservations", reservations);
 const PORT = process.env.PORT | 5000;
 
 const server = app.listen(
