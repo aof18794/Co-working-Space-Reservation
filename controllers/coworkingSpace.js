@@ -40,7 +40,7 @@ exports.getCoworkingSpaces = async (req, res, next) => {
 	const limit = parseInt(req.query.limit, 10) || 25; // the number of documents in each page
 	const startIndex = (page - 1) * limit; // start from 0 and then step by limit
 	const endIndex = page * limit;
-	const total = await coworkingSpace.countDocuments();
+	const total = await CoworkingSpace.countDocuments();
 
 	query = query.skip(startIndex).limit(limit);
 
@@ -106,7 +106,7 @@ exports.createCoworkingSpace = async (req, res, next) => {
 			data: coworking,
 		});
 	} catch (err) {
-		res.status(500).json({ success: false });
+		res.status(500).json({ message: err.message, success: false });
 	}
 };
 
