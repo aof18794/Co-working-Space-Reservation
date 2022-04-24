@@ -3,6 +3,7 @@ const CoworkingSpace = require('../models/CoworkingSpace');
 
 // Get all reservations
 // route GET /api/v1/reservations
+// route GET /api/v1/coworking/:name/reservations
 // access Private
 exports.getReservations = async (req, res, next) => {
 	let query;
@@ -61,30 +62,41 @@ exports.getReservation = async (req, res, next) => {
 };
 
 // Add one reservation
-// route POST /api/v1/coworkings/:coworkingId/reservations/
+// route POST /api/v1/coworkings/:name/reservations/
 // access Private
 exports.addReservation = async (req, res, next) => {
 	try {
-		req.body.coworking = req.params.coworkingId;
+		req.body.coworking = req.params.name;
 
 		req.body.user = req.user.id;
 
-		const exitedReservation = await Reservation.find({ user: req.user.id });
+		console.log(req.params);
+		console.log(req.user.id);
 
-		if (exitedReservation.length >= 3 && req.user.role !== 'admin') {
+		const existedReservation = await Reservation.find({ user: req.user.id });
+
+		if (existedReservation.length >= 3 && req.user.role !== 'admin') {
 			return res.status(400).json({
 				success: false,
 				message: `The user with ID ${req.user.id} has already made 3 reservations`,
 			});
 		}
 
+		console.log(existedReservation);
+
 		// Check existed coworking space
-		const coworking = await CoworkingSpace.findById(req.params.coworkingId);
+		const coworkingName = req.params.name;
+		const coworking = await CoworkingSpace.findOne({ name: coworkingName });
+
+		// console.log(coworkingName);
+		// console.log(coworkingName);
+		// console.log(coworkingName);
+		// console.log(coworking);
 
 		if (!coworking) {
 			return res.status(404).json({
 				success: false,
-				message: `No coworking with the id of ${req.params.coworkingId} `,
+				message: `No coworking with ${req.params.name} `,
 			});
 		}
 

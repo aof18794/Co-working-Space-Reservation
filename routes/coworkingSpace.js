@@ -14,7 +14,7 @@ const router = express.Router();
 const { protect, authorize } = require('../middleware/auth');
 
 //Re-route into other resource routers
-router.use('/:coworkingId/reservations/', reservationRouter);
+router.use('/:name/reservations/', reservationRouter);
 
 router
 	.route('/')
@@ -22,7 +22,7 @@ router
 	.post(protect, authorize('admin'), createCoworkingSpace);
 
 router
-	.route('/:id')
+	.route('/:name')
 	.get(getCoworkingSpace)
 	.put(protect, authorize('admin'), updateCoworkingSpace)
 	.delete(protect, authorize('admin'), deleteCoworkingSpace);

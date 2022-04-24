@@ -11,7 +11,7 @@ const ReservationSchema = new mongoose.Schema({
 		required: true,
 	},
 	coworking: {
-		type: mongoose.Schema.ObjectId,
+		type: String,
 		ref: 'CoworkingSpace',
 		required: true,
 	},

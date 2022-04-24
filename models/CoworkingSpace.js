@@ -7,6 +7,7 @@ const CoworkingSpaceSchema = new mongoose.Schema(
 			required: [true, 'Please add a name'],
 			unique: true,
 			trim: true,
+			index: true,
 			maxlength: [50, 'Name can not be more than 50 characters'],
 		},
 		address: {
@@ -35,15 +36,15 @@ const CoworkingSpaceSchema = new mongoose.Schema(
 
 //Cascade delete appointments when a hospital is deleted
 CoworkingSpaceSchema.pre('remove', async function (next) {
-	console.log(`Reservations being removed from co-working space ${this._id}`);
-	await this.model('Reservation').deleteMany({ coworking: this._id });
+	console.log(`Reservations being removed from co-working space ${this.name}`);
+	await this.model('Reservation').deleteMany({ coworking: this.name });
 	next();
 });
 
 //Reverse populate with virtuals
 CoworkingSpaceSchema.virtual('reservations', {
 	ref: 'Reservation', // ref to Appointment Schema
-	localField: '_id',
+	localField: 'name',
 	foreignField: 'coworking',
 	justOne: false,
 });

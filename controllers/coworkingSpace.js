@@ -73,24 +73,28 @@ exports.getCoworkingSpaces = async (req, res, next) => {
 			data: coworking,
 		});
 	} catch (err) {
+		console.log(err.message);
 		res.status(400).json({ success: false });
 	}
 };
 
 //@desc     Get single co-working space
-//@route    GET /api/v1/coworkings/:id
+//@route    GET /api/v1/coworkings/:name
 //@accress  Public
 exports.getCoworkingSpace = async (req, res, next) => {
 	try {
-		const coworking = await CoworkingSpace.findById(req.params.id).populate(
-			'reservations'
-		);
+		const name = req.params.name;
+		const coworking = await CoworkingSpace.findOne({
+			name,
+		}).populate('reservations');
 
 		if (!coworking) {
+			console.log('can not find co-working space with name', name);
 			return res.status(400).json({ success: false });
 		}
 		res.status(200).json({ success: true, data: coworking });
 	} catch (err) {
+		console.log(err.message);
 		res.status(400).json({ success: false });
 	}
 };
@@ -111,12 +115,13 @@ exports.createCoworkingSpace = async (req, res, next) => {
 };
 
 //@desc     Update co-working space
-//@route    PUT /api/v1/coworkings/:id
+//@route    PUT /api/v1/coworkings/:name
 //@accress  Private, Admin
 exports.updateCoworkingSpace = async (req, res, next) => {
 	try {
-		const coworking = await CoworkingSpace.findByIdAndUpdate(
-			req.params.id,
+		const name = req.params.name;
+		const coworking = await CoworkingSpace.findOneAndUpdate(
+			{ name },
 			req.body,
 			{
 				new: true,
@@ -125,21 +130,24 @@ exports.updateCoworkingSpace = async (req, res, next) => {
 		);
 
 		if (!coworking) {
+			console.log('can not find co-working space with name', name);
 			return res.status(400).json({ success: false });
 		}
 
 		res.status(200).json({ success: true, data: coworking });
 	} catch (err) {
+		console.log(err.message);
 		res.status(400).json({ success: false });
 	}
 };
 
 //@desc     Delete co-working space
-//@route    DELETE /api/v1/coworkings/:id
+//@route    DELETE /api/v1/coworkings/:name
 //@accress  Private, Admin
 exports.deleteCoworkingSpace = async (req, res, next) => {
 	try {
-		const coworking = await CoworkingSpace.findById(req.params.id);
+		const name = req.params.name;
+		const coworking = await CoworkingSpace.findOne({ name });
 
 		if (!coworking) {
 			return res.status(400).json({ success: false });
