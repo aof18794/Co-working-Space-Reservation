@@ -8,16 +8,34 @@ const CoworkingSpace = require("../models/CoworkingSpace");
 exports.getReservations = async (req, res, next) => {
   let query;
 
+  const coworkingId = req.params.coworkingId;
   if (req.user.role !== "admin") {
-    query = Reservation.find({ user: req.user.id }).populate({
-      path: "coworking",
-      select: "name address tel opentime closetime",
-    });
+    if (coworkingId != undefined) {
+      query = Reservation.find({
+        user: req.user.id,
+        coworking: coworkingId,
+      }).populate({
+        path: "coworking",
+        select: "name address tel opentime closetime",
+      });
+    } else {
+      query = Reservation.find({ user: req.user.id }).populate({
+        path: "coworking",
+        select: "name address tel opentime closetime",
+      });
+    }
   } else {
-    query = Reservation.find().populate({
-      path: "coworking",
-      select: "name address tel opentime closetime",
-    });
+    if (coworkingId != undefined) {
+      query = Reservation.find({ coworking: coworkingId }).populate({
+        path: "coworking",
+        select: "name address tel opentime closetime",
+      });
+    } else {
+      query = Reservation.find().populate({
+        path: "coworking",
+        select: "name address tel opentime closetime",
+      });
+    }
   }
 
   try {
@@ -42,7 +60,10 @@ exports.getReservations = async (req, res, next) => {
 // access Public
 exports.getReservation = async (req, res, next) => {
   try {
-    const reservation = await Reservation.findById(req.params.id);
+    const reservation = await Reservation.findById(req.params.id).populate({
+      path: "coworking",
+      select: "name address tel opentime closetime",
+    });
 
     if (!reservation) {
       return res.status(404).json({

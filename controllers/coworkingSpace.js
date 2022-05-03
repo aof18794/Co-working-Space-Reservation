@@ -92,8 +92,11 @@ exports.getCoworkingSpace = async (req, res, next) => {
     );
 
     if (!coworking) {
-      console.log("can not find co-working space with id", id);
-      return res.status(400).json({ success: false });
+      //console.log("Cannot find co-working space with id", id);
+      return res.status(400).json({
+        success: false,
+        message: `Cannot find co-working space with id ${id}`,
+      });
     }
     res.status(200).json({ success: true, data: coworking });
   } catch (err) {
@@ -133,8 +136,13 @@ exports.updateCoworkingSpace = async (req, res, next) => {
     );
 
     if (!coworking) {
-      console.log("can not find co-working space with id", coworkingId);
-      return res.status(400).json({ success: false });
+      //console.log("can not find co-working space with id", coworkingId);
+      return res
+        .status(400)
+        .json({
+          success: false,
+          message: `Cannot find co-working space with id ${coworkingId}`,
+        });
     }
 
     res.status(200).json({ success: true, data: coworking });
@@ -150,10 +158,15 @@ exports.updateCoworkingSpace = async (req, res, next) => {
 exports.deleteCoworkingSpace = async (req, res, next) => {
   try {
     const coworkingId = req.params.coworkingId;
-    const coworking = await CoworkingSpace.findById({ coworkingId });
+    const coworking = await CoworkingSpace.findById(coworkingId);
 
     if (!coworking) {
-      return res.status(400).json({ success: false });
+      return res
+        .status(400)
+        .json({
+          success: false,
+          message: `Cannot find co-working space with id ${coworkingId}`,
+        });
     }
 
     coworking.remove();
