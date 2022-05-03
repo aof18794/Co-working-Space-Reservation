@@ -9,26 +9,15 @@ exports.getReservations = async (req, res, next) => {
   let query;
 
   if (req.user.role !== "admin") {
-    query = Reservation.find({ user: req.user.id });
-
-    // .populate({
-    //   path: "coworking",
-    //   select: "name address tel opentime closetime",
-    // });
+    query = Reservation.find({ user: req.user.id }).populate({
+      path: "coworking",
+      select: "name address tel opentime closetime",
+    });
   } else {
-    // if (req.params.name) {
-    //   query = Reservation.find({ coworking: req.params.name }).populate({
-    //     path: "coworking",
-    //     select: "name address tel",
-    //   });
-    // } else {
-    //   query = Reservation.find().populate({
-    //     path: "coworking",
-    //     select: "name address tel",
-    //   });
-    // }
-    query = Reservation.find();
-    //console.log(query);
+    query = Reservation.find().populate({
+      path: "coworking",
+      select: "name address tel opentime closetime",
+    });
   }
 
   try {
@@ -55,12 +44,20 @@ exports.getReservation = async (req, res, next) => {
   try {
     const reservation = await Reservation.findById(req.params.id);
 
-    //console.log(reservation);
-
     if (!reservation) {
       return res.status(404).json({
         success: false,
         message: `No reservation with the id of ${req.params.id}`,
+      });
+    }
+
+    if (
+      req.user.role !== "admin" &&
+      req.user.id !== reservation.user.toString()
+    ) {
+      return res.status(401).json({
+        success: false,
+        message: "You are not authorized to access the reservation",
       });
     }
 
@@ -77,7 +74,7 @@ exports.getReservation = async (req, res, next) => {
 // access Private
 exports.addReservation = async (req, res, next) => {
   try {
-    req.body.coworking = req.params.name;
+    req.body.coworking = req.params.coworkingId;
 
     req.body.user = req.user.id;
 
@@ -96,8 +93,7 @@ exports.addReservation = async (req, res, next) => {
     console.log(existedReservation);
 
     // Check existed coworking space
-    const coworkingName = req.params.name;
-    const coworking = await CoworkingSpace.findOne({ name: coworkingName });
+    const coworking = await CoworkingSpace.findById(req.params.coworkingId);
 
     // console.log(coworkingName);
     // console.log(coworkingName);
@@ -107,7 +103,7 @@ exports.addReservation = async (req, res, next) => {
     if (!coworking) {
       return res.status(404).json({
         success: false,
-        message: `No coworking with ${req.params.name} `,
+        message: `No coworking with id ${req.params.coworkingId} `,
       });
     }
 
